@@ -15,15 +15,32 @@ router.post('/register', async (req, res) => {
       password,
     });
     console.log(jwtSecret);
-    let token = await jwt.sign({ id: UserDoc._id }, jwtSecret);
+    let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
 
-    res.cookie('token', token).status(201).json('ok');
+    res
+      .cookie('token', token, { sameSite: 'none', secure: true })
+      .status(201)
+      .json({ id: UserDoc._id });
   } catch (e) {
     res.status(400).json(e);
   }
 });
-router.get('/registerrrr', (req, res) => {
-  res.send('hi');
+
+router.get('/profile', async (req, res) => {
+  try {
+    let token = req.cookies?.token;
+    if (token) {
+      let decodedJson = await jwt.verify(token, jwtSecret);
+      let { id, username } = decodedJson;
+      const UserDoc = await UserModel.findById(id);
+      res.status(200).json({ id: UserDoc._id, username: UserDoc.username });
+    } else {
+      res.status(401).json({ msg: 'unauthorized' });
+    }
+  } catch (e) {
+    console.log(e);
+    res.status(401).json({ msg: 'unauthorized' });
+  }
 });
 
 module.exports = router;

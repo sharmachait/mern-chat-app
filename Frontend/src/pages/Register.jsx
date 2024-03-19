@@ -1,14 +1,22 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import axios from 'axios';
+import { UserContext } from '../store/UserContext.jsx';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  const { setContextUsername, setId } = useContext(UserContext);
+
   async function register(e) {
     e.preventDefault();
     const response = await axios.post('/auth/register', { username, password });
-    if (response.status === 200) console.log('logged in');
+    if (response.status === 201) {
+      setId(response.data.id);
+      setContextUsername(response.data.username);
+    }
   }
+
   return (
     <div className="bg-[#0b132b] h-svh flex flex-col gap-2 items-center justify-center ">
       <div className="text-[#DAF2FE] font-bold text-2xl p-2">yapp</div>

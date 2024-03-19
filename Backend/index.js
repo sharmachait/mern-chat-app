@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const authRouter = require('./routers/Auth');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -11,6 +12,7 @@ async function StartUp() {
     await mongoose.connect(process.env.MongoUrl);
     const app = express();
 
+    app.use(cors({ credentials: true, origin: process.env.ClientUrl }));
     app.use(bodyParser.json());
     app.use(cookieParser());
     app.use('/auth', authRouter);
