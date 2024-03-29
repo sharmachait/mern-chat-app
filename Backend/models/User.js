@@ -8,6 +8,15 @@ const UserSchema = new mongoose.Schema(
       unique: true,
     },
     password: String,
+    emailConfirmationToken: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    emailConfirmedFlag: {
+      type: Boolean,
+      required: true,
+    },
   },
   {
     timestamps: true,

@@ -1,11 +1,15 @@
-import React, { useContext } from 'react';
-import Register from './pages/Register.jsx';
+import { useContext, useEffect } from 'react';
+import RegisterAndLoginPage from './pages/RegisterAndLoginPage.jsx';
 import { UserContext } from './store/UserContext.jsx';
 
 const Routes = () => {
-  const { contextUsername, id } = useContext(UserContext);
-  console.log(contextUsername);
-  if (contextUsername) return 'logged in';
-  return <Register></Register>;
+  useEffect(() => {
+    console.log('routes rendered');
+  }, []);
+  const { contextUsername, id, setContextUsername, setId } =
+    useContext(UserContext);
+
+  if (contextUsername) return `logged in as ${contextUsername}`;
+  return <RegisterAndLoginPage></RegisterAndLoginPage>;
 };
 export default Routes;
