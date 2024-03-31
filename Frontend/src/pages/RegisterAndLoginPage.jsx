@@ -4,7 +4,6 @@ import { UserContext } from '../store/UserContext.jsx';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-toast.configure();
 const RegisterAndLoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -12,12 +11,11 @@ const RegisterAndLoginPage = () => {
 
   const { setContextUsername, setId } = useContext(UserContext);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (formMode === 'Register') register();
-    else login();
+    if (formMode === 'Register') await register();
+    else await login();
   }
-
   async function login() {
     const response = await axios.post('/auth/login', { username, password });
     if (response.status === 201) {
@@ -53,8 +51,8 @@ const RegisterAndLoginPage = () => {
         <input
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          type="text"
-          placeholder="Username"
+          type="Email"
+          placeholder="Email"
           className="block w-full font-semibold rounded-md p-2 border"
         />
         <input

@@ -9,7 +9,35 @@ const bcryptsalt = bcrypt.genSaltSync(10);
 
 const router = express.Router();
 
-router.get('/verify/:emailConfirmationToken', async (req, res) => {});
+router.post('/verify', async (req, res) => {
+  try {
+    const { username, token } = req.body;
+    const UserDoc = await UserModel.findOne({
+      username,
+    });
+    const compare = req.body.token === UserDoc.emailConfirmationToken;
+    console.log(req.body.token);
+    console.log(UserDoc.emailConfirmationToken);
+    console.log(compare);
+    if (compare) {
+      await UserModel.updateOne(
+        { username: req.body.username },
+        { emailConfirmedFlag: true }
+      );
+      res.status(201).json({ msg: 'Verified' });
+    } else {
+      res.status(500).json({ msg: 'Invalid token' });
+    }
+  } catch (e) {
+    res.status(500).json({ msg: 'user not found' });
+  }
+});
+router.get('/logout', async (req, res) => {
+  res
+    .cookie('token', '', { sameSite: 'none', secure: true })
+    .status(201)
+    .send('logged out');
+});
 
 router.post('/register', async (req, res) => {
   try {
@@ -28,7 +56,7 @@ router.post('/register', async (req, res) => {
       name: 'yapper',
       address: process.env.senderemail,
     };
-    const defaultTo = 'chait8126@gmail.com';
+    const defaultTo = username;
     const subject = 'Yapper account verfication';
     const token = emailConfirmationToken;
     const response = await sendMail(defaultFrom, defaultTo, subject, token);
@@ -51,16 +79,18 @@ router.post('/login', async (req, res) => {
 
     if (!UserDoc.emailConfirmedFlag) {
       res.status(401).json({ msg: 'Account not verified' });
+    } else if (!hashed === UserDoc.password) {
+      res.status(401).json({ msg: 'Incorrect credentials' });
+    } else {
+      let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
+
+      res
+        .cookie('token', token, { sameSite: 'none', secure: true })
+        .status(201)
+        .json({ id: UserDoc._id, username });
     }
-
-    let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
-
-    res
-      .cookie('token', token, { sameSite: 'none', secure: true })
-      .status(201)
-      .json({ id: UserDoc._id });
   } catch (e) {
-    res.status(400).json(e);
+    res.status(404).json('User not found');
   }
 });
 

@@ -7,6 +7,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
 
+const setupSocketServer = require('./webSocket');
+
 async function StartUp() {
   try {
     await mongoose.connect(process.env.MongoUrl);
@@ -22,10 +24,11 @@ async function StartUp() {
     app.use(cookieParser());
     app.use('/auth', authRouter);
 
-    app.listen(
+    const server = app.listen(
       process.env.PORT,
       console.log(`listening on ${process.env.PORT}`)
     );
+    await setupSocketServer(server);
   } catch (e) {
     console.log('error ' + e);
   }

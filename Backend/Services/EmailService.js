@@ -22,7 +22,7 @@ function createOptions(from, to, subject, token) {
     from: from,
     to: to,
     subject: subject,
-    text: `Please clink on the link below to verify your email id. \n http://localhost:5173/auth/verify/${token}`,
+    text: `Please clink on the link below to verify your email id. \n http://localhost:5173/verify \n your authentication token is ${token}`,
   };
 }
 const sendMail = async (
