@@ -1,10 +1,17 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 // import { UserContext } from '../store/UserContext.jsx';
 
 const Home = () => {
+  const [wsc, setWsc] = useState(null);
   // const { contextUsername } = useContext(UserContext);
+  function handleMessage(e) {
+    console.log('new message ' + e);
+  }
   useEffect(() => {
-    const socket = new WebSocket('ws://localhost:3000');
+    const wsc = new WebSocket('ws://localhost:3000');
+    setWsc(wsc);
+
+    wsc.addEventListener('message', handleMessage);
   }, []);
   async function handleClick(e) {
     e.preventDefault();
