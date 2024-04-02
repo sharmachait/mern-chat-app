@@ -5,7 +5,8 @@ const Home = () => {
   const [wsc, setWsc] = useState(null);
   // const { contextUsername } = useContext(UserContext);
   function handleMessage(e) {
-    console.log('new message ' + e);
+    const messageData = e.data;
+    console.log(JSON.parse(messageData)['online']);
   }
   useEffect(() => {
     const wsc = new WebSocket('ws://localhost:3000');

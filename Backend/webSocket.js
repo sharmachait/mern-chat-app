@@ -2,6 +2,20 @@ const ws = require('ws');
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JwtSecret;
 
+function getIdUsernameFromClient(client) {
+  return { userId: client.userId, username: client.username };
+}
+function sendAliveUsers(listOfClients) {
+  let listOfUsers = listOfClients.map(getIdUsernameFromClient);
+  const users = {};
+
+  listOfUsers.forEach((user) => (users[user.userId] = user.username));
+
+  listOfClients.forEach((client) => {
+    client.send(JSON.stringify({ online: users }));
+  });
+}
+
 async function setupSocketServer(expressServer) {
   const wss = new ws.WebSocketServer({ server: expressServer });
   wss.on('connection', async (connection, req) => {
@@ -14,6 +28,9 @@ async function setupSocketServer(expressServer) {
         cookie = cookies.split(';').find((s) => s.startsWith('token='));
         if (cookie) {
           token = cookie.split('=')[1];
+        } else {
+          await connection.terminate();
+          return;
         }
         if (token) {
           let decodedJson = await jwt.verify(token, jwtSecret);
@@ -21,10 +38,25 @@ async function setupSocketServer(expressServer) {
           //verified
           connection.userId = id;
           connection.username = username;
+          connection.on('close', () => {
+            delete connection['userId'];
+            delete connection['username'];
+            let listOfClients = [...wss.clients];
+            sendAliveUsers(listOfClients);
+          });
+
+          //all the connections are stored in the WebSocketServer.clients object
+        } else {
+          await connection.terminate();
+          return;
         }
+      } else {
+        await connection.terminate();
+        return;
       }
       //seeing who all are online
-      console.log([...wss.clients].map((c) => c.username));
+      let listOfClients = [...wss.clients];
+      sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);
     }

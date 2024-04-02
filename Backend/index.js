@@ -28,6 +28,7 @@ async function StartUp() {
       process.env.PORT,
       console.log(`listening on ${process.env.PORT}`)
     );
+    // module.exports = { server };
     await setupSocketServer(server);
   } catch (e) {
     console.log('error ' + e);

@@ -4,8 +4,10 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const sendMail = require('../Services/EmailService');
 const UserModel = require('../models/User');
+// const setupSocketServer = require('../webSocket');
 const jwtSecret = process.env.JwtSecret;
 const bcryptsalt = bcrypt.genSaltSync(10);
+// const { server } = require('../index');
 
 const router = express.Router();
 
@@ -83,14 +85,14 @@ router.post('/login', async (req, res) => {
       res.status(401).json({ msg: 'Incorrect credentials' });
     } else {
       let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
-
+      // await setupSocketServer(server);
       res
         .cookie('token', token, { sameSite: 'none', secure: true })
         .status(201)
         .json({ id: UserDoc._id, username });
     }
   } catch (e) {
-    res.status(404).json('User not found');
+    res.status(404).json(e);
   }
 });
 
