@@ -18,6 +18,7 @@ function sendAliveUsers(listOfClients) {
 
 async function setupSocketServer(expressServer) {
   const wss = new ws.WebSocketServer({ server: expressServer });
+
   wss.on('connection', async (connection, req) => {
     try {
       const cookies = req.headers.cookie;
@@ -44,8 +45,11 @@ async function setupSocketServer(expressServer) {
             let listOfClients = [...wss.clients];
             sendAliveUsers(listOfClients);
           });
-
           //all the connections are stored in the WebSocketServer.clients object
+
+          connection.on('message', (message) => {
+            console.log(message);
+          });
         } else {
           await connection.terminate();
           return;
@@ -54,11 +58,13 @@ async function setupSocketServer(expressServer) {
         await connection.terminate();
         return;
       }
-      //seeing who all are online
+      //Notifying everyone about who is online
       let listOfClients = [...wss.clients];
       sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);
+      await connection.terminate();
+      return;
     }
   });
 }
