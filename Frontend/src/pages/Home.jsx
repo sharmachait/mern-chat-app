@@ -10,13 +10,19 @@ const Home = () => {
   const [wsc, setWsc] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
-  // const { contextUsername } = useContext(UserContext);
+  const [messages, setMessages] = useState([]);
   const { contextUsername, id } = useContext(UserContext);
+
   function handleMessage(e) {
-    const messageData = e.data;
-    setOnlinePeople(JSON.parse(messageData)['online']);
-    console.log(JSON.parse(messageData)['online']);
+    const messageData = JSON.parse(e.data);
+    if ('online' in messageData) {
+      setOnlinePeople(messageData?.online);
+      console.log(messageData?.online);
+    } else {
+      console.log(messageData?.text);
+    }
   }
+
   useEffect(() => {
     const wsc = new WebSocket('ws://localhost:3000');
     setWsc(wsc);
@@ -65,7 +71,12 @@ const Home = () => {
           {selectedUserId === null ? (
             <DefaultChatWindow></DefaultChatWindow>
           ) : (
-            <ChatWindow wsc={wsc} selectedUserId={selectedUserId}></ChatWindow>
+            <ChatWindow
+              wsc={wsc}
+              selectedUserId={selectedUserId}
+              messages={messages}
+              setMessages={setMessages()}
+            ></ChatWindow>
           )}
         </div>
       </div>

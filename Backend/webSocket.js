@@ -48,7 +48,15 @@ async function setupSocketServer(expressServer) {
           //all the connections are stored in the WebSocketServer.clients object
 
           connection.on('message', (message) => {
-            console.log(message);
+            console.log(message.toString());
+            message = JSON.parse(message.toString());
+            const { recipient, text } = message;
+
+            for (let client of wss.clients) {
+              if (client.userId === recipient) {
+                client.send(JSON.stringify({ text }));
+              }
+            }
           });
         } else {
           await connection.terminate();
@@ -64,7 +72,6 @@ async function setupSocketServer(expressServer) {
     } catch (e) {
       console.log('error: ' + e);
       await connection.terminate();
-      return;
     }
   });
 }

@@ -1,28 +1,30 @@
 import React, { useState } from 'react';
 
-const ChatWindow = ({ wsc, selectedUserId }) => {
+const ChatWindow = ({ wsc, selectedUserId, setMessages, messages }) => {
   const [newText, setNewText] = useState('');
   async function handleSend(e) {
     e.preventDefault();
-    console.log(
+    wsc.send(
       JSON.stringify({
-        message: {
-          recipient: selectedUserId,
-        },
+        recipient: selectedUserId,
+        text: newText,
       })
     );
-    // wsc.send(
-    //   JSON.stringify({
-    //     message: {
-    //       recipient: selectedUserId,
-    //     },
-    //   })
-    // );
+    setMessages((prev) => [...prev, { text: newText, fromMe: true }]);
+    setNewText('');
   }
 
   return (
     <div className="ml-4 xl:ml-10 flex flex-col h-full">
-      <div className="flex-grow">messages</div>
+      <div className="flex-grow">
+        {messages.length > 0 && (
+          <div>
+            {messages.map((x) => (
+              <li key={x}>{x.text}</li>
+            ))}
+          </div>
+        )}
+      </div>
       <div className="pb-4 pr-2">
         <form className="flex gap-2">
           <input
