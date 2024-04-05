@@ -10,8 +10,8 @@ const ChatWindow = ({ wsc, selectedUserId, setMessages, messages }) => {
         text: newText,
       })
     );
-    setMessages((prev) => [...prev, { text: newText, fromMe: true }]);
-    setNewText('');
+    // setMessages((prev) => [...prev, { text: newText, fromMe: true }]);
+    // setNewText('');
   }
 
   return (

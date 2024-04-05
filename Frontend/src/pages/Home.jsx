@@ -26,7 +26,7 @@ const Home = () => {
   useEffect(() => {
     const wsc = new WebSocket('ws://localhost:3000');
     setWsc(wsc);
-
+    console.log(selectedUserId);
     wsc.addEventListener('message', handleMessage);
   }, []);
 
@@ -41,7 +41,9 @@ const Home = () => {
                 userId !== id ? (
                   <div
                     onClick={() => {
+                      // console.log(userId);
                       setSelectedUserId(userId);
+                      // console.log(selectedUserId);
                     }}
                     className={
                       'flex border border-l-0 border-r-0 border-t-0 border-b-[#3a506b] cursor-pointer ' +
@@ -75,7 +77,7 @@ const Home = () => {
               wsc={wsc}
               selectedUserId={selectedUserId}
               messages={messages}
-              setMessages={setMessages()}
+              setMessages={setMessages}
             ></ChatWindow>
           )}
         </div>
