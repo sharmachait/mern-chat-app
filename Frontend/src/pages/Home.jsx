@@ -1,47 +1,43 @@
 import { useContext, useEffect, useState } from 'react';
 import Avatar from '../components/Avatar.jsx';
 import Logo from '../components/Logo.jsx';
-import { UserContext } from '../store/UserContext.jsx';
 import ChatWindow from '../components/ChatWindow.jsx';
 import DefaultChatWindow from '../components/DefaultChatWindow.jsx';
-// import { UserContext } from '../store/UserContext.jsx';
+import { UserContext } from '../store/UserContext.jsx';
 
-const Home = ({ id }) => {
+const Home = () => {
   const [wsc, setWsc] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const { contextUsername } = useContext(UserContext);
+  const { contextUsername, id } = useContext(UserContext);
 
   function handleMessage(e) {
     const messageData = JSON.parse(e.data);
-    console.log(e.data);
+
     if ('online' in messageData) {
       setOnlinePeople(messageData?.online);
     } else if ('text' in messageData) {
-      let fromMe = false;
-      console.log(id);
-      if (id === messageData.sender) {
-        fromMe = true;
+      if (id !== '') {
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: messageData.text,
+            messageId: messageData.messageId,
+            sender: messageData.sender,
+            recipient: messageData.recipient,
+          },
+        ]);
       }
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: messageData.text,
-          fromMe: fromMe,
-          messageId: messageData.messageId,
-          sender: messageData.sender,
-          recipient: messageData.recipient,
-        },
-      ]);
     }
   }
 
   useEffect(() => {
     const wsc = new WebSocket('ws://localhost:3000');
-    setWsc(wsc);
     wsc.addEventListener('message', handleMessage);
-  }, []);
+    console.log(onlinePeople);
+    setWsc(wsc);
+  }, [id]);
 
   return (
     <div className="bg-[#3a506b] h-screen">
@@ -87,6 +83,7 @@ const Home = ({ id }) => {
             <ChatWindow
               wsc={wsc}
               selectedUserId={selectedUserId}
+              onlinePeople={onlinePeople}
               messages={messages}
               setMessages={setMessages}
             ></ChatWindow>

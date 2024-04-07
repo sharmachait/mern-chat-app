@@ -62,7 +62,6 @@ async function setupSocketServer(expressServer) {
                   client.userId === recipient ||
                   client.userId === connection.userId
                 ) {
-                  console.log(connection.userId);
                   client.send(
                     JSON.stringify({
                       text,

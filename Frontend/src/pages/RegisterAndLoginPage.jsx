@@ -47,7 +47,7 @@ const RegisterAndLoginPage = () => {
 
   return (
     <div className="bg-[#0b132b] h-svh flex flex-col gap-2 items-center justify-center ">
-      <div className="text-[#DAF2FE] font-bold text-2xl p-2">yapp</div>
+      <div className="text-purple-200 font-bold text-2xl p-2">yapp</div>
       <form className="w-80 flex flex-col gap-2 mb-40">
         <input
           value={username}
@@ -64,7 +64,7 @@ const RegisterAndLoginPage = () => {
           className="block font-semibold w-full rounded-md p-2 border"
         />
         <button
-          className="bg-[#5bc0be] font-semibold block w-full rounded-md p-2"
+          className="bg-purple-200 font-semibold block w-full rounded-md p-2"
           onClick={handleSubmit}
         >
           {formMode}
@@ -72,14 +72,16 @@ const RegisterAndLoginPage = () => {
         <div className="text-center mt-2">
           {formMode === 'Register' && (
             <div className="flex gap-2 justify-center text-[#DAF2FE] font-bold p-2">
-              <div>Already a member?</div>
+              <div>Already a member ?</div>
               <button onClick={changeMode}>Login Here</button>
             </div>
           )}
           {formMode === 'Login' && (
-            <div className="flex gap-2 justify-center text-[#DAF2FE] font-bold p-2">
-              <div>Not a member yet? </div>
-              <button onClick={changeMode}>Register Here</button>
+            <div className="flex gap-2 justify-center text-purple-200 font-bold p-2">
+              <div>Not a member yet ? </div>
+              <button className="" onClick={changeMode}>
+                Register Here
+              </button>
             </div>
           )}
         </div>

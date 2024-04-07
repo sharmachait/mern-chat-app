@@ -1,10 +1,17 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { UserContext } from '../store/UserContext.jsx';
 import { uniqBy } from 'lodash';
+import Message from './Message.jsx';
 
-const ChatWindow = ({ wsc, selectedUserId, messages, setMessages }) => {
+const ChatWindow = ({
+  wsc,
+  selectedUserId,
+  messages,
+  setMessages,
+  onlinePeople,
+}) => {
   const [newText, setNewText] = useState('');
-  const { contextUsername, id } = useContext(UserContext);
+  const { id } = useContext(UserContext);
   async function handleSend(e) {
     e.preventDefault();
     wsc.send(
@@ -14,26 +21,29 @@ const ChatWindow = ({ wsc, selectedUserId, messages, setMessages }) => {
         text: newText,
       })
     );
-    // setMessages((prev) => [...prev, { text: newText, fromMe: true }]);
     setNewText('');
   }
 
-  console.log(messages);
+  console.log({ messages });
   const uniqueMessages = uniqBy(messages, 'messageId');
-
+  console.log({ uniqueMessages });
   return (
-    <div className="ml-4 xl:ml-10 flex flex-col h-full">
+    <div className="ml-4 mr-4 pt-4 xl:ml-10 flex flex-col h-full">
       <div className="flex-grow">
         {uniqueMessages.length > 0 && (
-          <div>
+          <div className="flex flex-col">
             {uniqueMessages.map((x) => (
-              <li key={x}>{x.text}</li>
+              <Message
+                key={x.messageId}
+                message={x}
+                onlinePeople={onlinePeople}
+              ></Message>
             ))}
           </div>
         )}
       </div>
-      <div className="pb-4 pr-2">
-        <form className="flex gap-2">
+      <div className="pb-4 pr-2 ">
+        <form className="flex gap-2 ">
           <input
             type="text"
             placeholder="Type a message"
