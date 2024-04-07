@@ -1,25 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { UserContext } from '../store/UserContext.jsx';
+import { uniqBy } from 'lodash';
 
-const ChatWindow = ({ wsc, selectedUserId, setMessages, messages }) => {
+const ChatWindow = ({ wsc, selectedUserId, messages, setMessages }) => {
   const [newText, setNewText] = useState('');
+  const { contextUsername, id } = useContext(UserContext);
   async function handleSend(e) {
     e.preventDefault();
     wsc.send(
       JSON.stringify({
+        sender: id,
         recipient: selectedUserId,
         text: newText,
       })
     );
     // setMessages((prev) => [...prev, { text: newText, fromMe: true }]);
-    // setNewText('');
+    setNewText('');
   }
+
+  console.log(messages);
+  const uniqueMessages = uniqBy(messages, 'messageId');
 
   return (
     <div className="ml-4 xl:ml-10 flex flex-col h-full">
       <div className="flex-grow">
-        {messages.length > 0 && (
+        {uniqueMessages.length > 0 && (
           <div>
-            {messages.map((x) => (
+            {uniqueMessages.map((x) => (
               <li key={x}>{x.text}</li>
             ))}
           </div>

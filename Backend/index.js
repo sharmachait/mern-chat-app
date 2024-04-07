@@ -20,6 +20,7 @@ async function StartUp() {
         origin: process.env.ClientUrl,
       })
     );
+
     app.use(bodyParser.json());
     app.use(cookieParser());
     app.use('/auth', authRouter);

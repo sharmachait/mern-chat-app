@@ -18,6 +18,7 @@ const RegisterAndLoginPage = () => {
   }
   async function login() {
     const response = await axios.post('/auth/login', { username, password });
+
     if (response.status === 201) {
       setId(response.data.id);
       setContextUsername(response.data.username);

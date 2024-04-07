@@ -6,27 +6,40 @@ import ChatWindow from '../components/ChatWindow.jsx';
 import DefaultChatWindow from '../components/DefaultChatWindow.jsx';
 // import { UserContext } from '../store/UserContext.jsx';
 
-const Home = () => {
+const Home = ({ id }) => {
   const [wsc, setWsc] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const { contextUsername, id } = useContext(UserContext);
+  const { contextUsername } = useContext(UserContext);
 
   function handleMessage(e) {
     const messageData = JSON.parse(e.data);
+    console.log(e.data);
     if ('online' in messageData) {
       setOnlinePeople(messageData?.online);
-      console.log(messageData?.online);
-    } else {
-      console.log(messageData?.text);
+    } else if ('text' in messageData) {
+      let fromMe = false;
+      console.log(id);
+      if (id === messageData.sender) {
+        fromMe = true;
+      }
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: messageData.text,
+          fromMe: fromMe,
+          messageId: messageData.messageId,
+          sender: messageData.sender,
+          recipient: messageData.recipient,
+        },
+      ]);
     }
   }
 
   useEffect(() => {
     const wsc = new WebSocket('ws://localhost:3000');
     setWsc(wsc);
-    console.log(selectedUserId);
     wsc.addEventListener('message', handleMessage);
   }, []);
 
@@ -41,9 +54,7 @@ const Home = () => {
                 userId !== id ? (
                   <div
                     onClick={() => {
-                      // console.log(userId);
                       setSelectedUserId(userId);
-                      // console.log(selectedUserId);
                     }}
                     className={
                       'flex border border-l-0 border-r-0 border-t-0 border-b-[#3a506b] cursor-pointer ' +

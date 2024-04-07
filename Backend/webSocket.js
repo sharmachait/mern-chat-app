@@ -1,6 +1,7 @@
 const ws = require('ws');
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JwtSecret;
+const MessageModel = require('./models/Message');
 
 function getIdUsernameFromClient(client) {
   return { userId: client.userId, username: client.username };
@@ -47,14 +48,30 @@ async function setupSocketServer(expressServer) {
           });
           //all the connections are stored in the WebSocketServer.clients object
 
-          connection.on('message', (message) => {
-            console.log(message.toString());
+          connection.on('message', async (message) => {
             message = JSON.parse(message.toString());
             const { recipient, text } = message;
-
-            for (let client of wss.clients) {
-              if (client.userId === recipient) {
-                client.send(JSON.stringify({ text }));
+            if (recipient && text) {
+              const messageDoc = await MessageModel.create({
+                sender: connection.userId,
+                recipient: recipient,
+                text: text,
+              });
+              for (let client of wss.clients) {
+                if (
+                  client.userId === recipient ||
+                  client.userId === connection.userId
+                ) {
+                  console.log(connection.userId);
+                  client.send(
+                    JSON.stringify({
+                      text,
+                      sender: connection.userId,
+                      recipient: recipient,
+                      messageId: messageDoc._id,
+                    })
+                  );
+                }
               }
             }
           });
