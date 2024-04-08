@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../store/UserContext.jsx';
 import { uniqBy } from 'lodash';
 import Message from './Message.jsx';
@@ -9,6 +9,7 @@ const ChatWindow = ({
   messages,
   setMessages,
   onlinePeople,
+  latestMessageRef,
 }) => {
   const [newText, setNewText] = useState('');
   const { id } = useContext(UserContext);
@@ -24,11 +25,18 @@ const ChatWindow = ({
     setNewText('');
   }
 
-  console.log({ messages });
+  useEffect(() => {
+    const div = latestMessageRef.current;
+    div.scrollTop = div.scrollHeight;
+  }, [messages]);
+
   const uniqueMessages = uniqBy(messages, 'messageId');
-  console.log({ uniqueMessages });
+
   return (
-    <div className="ml-4 mr-4 pt-4 xl:ml-10 flex flex-col h-full">
+    <div
+      ref={latestMessageRef}
+      className="ml-4 mr-4 p-4 xl:ml-10 flex flex-col h-full overflow-y-scroll"
+    >
       <div className="flex-grow">
         {uniqueMessages.length > 0 && (
           <div className="flex flex-col">
@@ -42,7 +50,7 @@ const ChatWindow = ({
           </div>
         )}
       </div>
-      <div className="pb-4 pr-2 ">
+      <div>
         <form className="flex gap-2 ">
           <input
             type="text"

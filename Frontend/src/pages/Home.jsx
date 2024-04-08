@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import Avatar from '../components/Avatar.jsx';
 import Logo from '../components/Logo.jsx';
 import ChatWindow from '../components/ChatWindow.jsx';
@@ -11,6 +11,7 @@ const Home = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
   const { contextUsername, id } = useContext(UserContext);
+  const latestMessageRef = useRef();
 
   function handleMessage(e) {
     const messageData = JSON.parse(e.data);
@@ -86,6 +87,7 @@ const Home = () => {
               onlinePeople={onlinePeople}
               messages={messages}
               setMessages={setMessages}
+              latestMessageRef={latestMessageRef}
             ></ChatWindow>
           )}
         </div>
