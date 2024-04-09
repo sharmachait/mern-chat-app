@@ -44,6 +44,7 @@ async function setupSocketServer(expressServer) {
             delete connection['userId'];
             delete connection['username'];
             let listOfClients = [...wss.clients];
+            console.log('client deleted ');
             sendAliveUsers(listOfClients);
           });
           //all the connections are stored in the WebSocketServer.clients object
@@ -54,6 +55,7 @@ async function setupSocketServer(expressServer) {
             if (recipient && text) {
               const messageDoc = await MessageModel.create({
                 sender: connection.userId,
+                from: connection.username,
                 recipient: recipient,
                 text: text,
               });
@@ -68,6 +70,7 @@ async function setupSocketServer(expressServer) {
                       sender: connection.userId,
                       recipient: recipient,
                       messageId: messageDoc._id,
+                      from: messageDoc.from,
                     })
                   );
                 }

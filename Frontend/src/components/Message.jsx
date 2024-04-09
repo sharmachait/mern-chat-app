@@ -29,7 +29,7 @@ const Message = ({ message, onlinePeople }) => {
                       p-1
                       rounded-full"
           >
-            {onlinePeople[message.sender].split('@')[0]}
+            {message.from.split('@')[0]}
           </div>
           <div
             className={

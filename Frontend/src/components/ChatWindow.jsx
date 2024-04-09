@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../store/UserContext.jsx';
 import { uniqBy } from 'lodash';
 import Message from './Message.jsx';
+import axios from 'axios';
 
 const ChatWindow = ({
   wsc,
@@ -13,6 +14,7 @@ const ChatWindow = ({
 }) => {
   const [newText, setNewText] = useState('');
   const { id } = useContext(UserContext);
+
   async function handleSend(e) {
     e.preventDefault();
     wsc.send(
@@ -26,8 +28,26 @@ const ChatWindow = ({
   }
 
   useEffect(() => {
+    async function getMessages() {
+      const response = await axios.get(`messages/${selectedUserId}`);
+      if (response.status === 200) {
+        const messagesFromDb = response.data.messages;
+        setMessages(messagesFromDb);
+        console.log(messagesFromDb);
+
+        console.log({ messagesFromDb: messagesFromDb });
+      }
+      return response;
+    }
+    if (selectedUserId) {
+      getMessages();
+    }
+  }, [selectedUserId]);
+
+  useEffect(() => {
     const div = latestMessageRef.current;
     div.scrollTop = div.scrollHeight;
+    console.log({ messagesOnFrontend: messages[0] });
   }, [messages]);
 
   const uniqueMessages = uniqBy(messages, 'messageId');

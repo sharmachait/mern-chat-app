@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const authRouter = require('./routers/Auth');
+const messageRouter = require('./routers/Message');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -24,6 +25,7 @@ async function StartUp() {
     app.use(bodyParser.json());
     app.use(cookieParser());
     app.use('/auth', authRouter);
+    app.use('/messages', messageRouter);
 
     const server = app.listen(
       process.env.PORT,

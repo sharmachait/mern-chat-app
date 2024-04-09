@@ -27,17 +27,26 @@ const Home = () => {
             messageId: messageData.messageId,
             sender: messageData.sender,
             recipient: messageData.recipient,
+            from: messageData.from,
           },
         ]);
       }
     }
   }
 
-  useEffect(() => {
+  function connectToWebSocket() {
     const wsc = new WebSocket('ws://localhost:3000');
     wsc.addEventListener('message', handleMessage);
+    wsc.addEventListener('close', () => {
+      console.log('Disconnected. Trying to reconnect.');
+      connectToWebSocket();
+    }); //comment out incase you dont want to reconnect
     console.log(onlinePeople);
     setWsc(wsc);
+  }
+
+  useEffect(() => {
+    connectToWebSocket();
   }, [id]);
 
   return (

@@ -99,7 +99,7 @@ router.post('/login', async (req, res) => {
 router.get('/profile', async (req, res) => {
   try {
     let token = req.cookies?.token;
-
+    console.log(token);
     if (token) {
       let decodedJson = await jwt.verify(token, jwtSecret);
       let { id, username } = decodedJson;
