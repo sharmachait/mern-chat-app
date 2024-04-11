@@ -7,11 +7,14 @@ function getIdUsernameFromClient(client) {
   return { userId: client.userId, username: client.username };
 }
 function sendAliveUsers(listOfClients) {
-  let listOfUsers = listOfClients.map(getIdUsernameFromClient);
+  let listOfUsers = [];
+  for (let client of listOfClients) {
+    if (client.isAlive) {
+      listOfUsers.push(getIdUsernameFromClient(client));
+    }
+  }
   const users = {};
-
   listOfUsers.forEach((user) => (users[user.userId] = user.username));
-
   listOfClients.forEach((client) => {
     client.send(JSON.stringify({ online: users }));
   });
@@ -31,7 +34,7 @@ async function setupSocketServer(expressServer) {
         if (cookie) {
           token = cookie.split('=')[1];
         } else {
-          await connection.terminate();
+          connection.terminate();
           return;
         }
         if (token) {
@@ -40,9 +43,29 @@ async function setupSocketServer(expressServer) {
           //verified
           connection.userId = id;
           connection.username = username;
+          connection.isAlive = true;
+
+          connection.pinger = setInterval(() => {
+            connection.ping();
+            console.log('initiating death.');
+            connection.killer = setTimeout(() => {
+              connection.isAlive = false;
+              connection.terminate();
+              let listOfClients = [...wss.clients];
+              console.log('client killed. ');
+              sendAliveUsers(listOfClients);
+            }, 2000);
+          }, 15000);
+
+          connection.on('pong', () => {
+            console.log('you are lucky to live longer.');
+            clearTimeout(connection.killer);
+          });
+
           connection.on('close', () => {
             delete connection['userId'];
             delete connection['username'];
+            clearInterval(connection.pinger);
             let listOfClients = [...wss.clients];
             console.log('client deleted ');
             sendAliveUsers(listOfClients);
@@ -78,11 +101,11 @@ async function setupSocketServer(expressServer) {
             }
           });
         } else {
-          await connection.terminate();
+          connection.terminate();
           return;
         }
       } else {
-        await connection.terminate();
+        connection.terminate();
         return;
       }
       //Notifying everyone about who is online
@@ -90,7 +113,7 @@ async function setupSocketServer(expressServer) {
       sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);
-      await connection.terminate();
+      connection.terminate();
     }
   });
 }

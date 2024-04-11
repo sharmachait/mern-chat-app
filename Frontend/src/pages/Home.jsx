@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState, useRef } from 'react';
-import Avatar from '../components/Avatar.jsx';
 import Logo from '../components/Logo.jsx';
 import ChatWindow from '../components/ChatWindow.jsx';
 import DefaultChatWindow from '../components/DefaultChatWindow.jsx';
 import { UserContext } from '../store/UserContext.jsx';
+import axios from 'axios';
+import ListPeople from '../components/ListPeople.jsx';
 
 const Home = () => {
   const [wsc, setWsc] = useState(null);
   const [onlinePeople, setOnlinePeople] = useState({});
+  const [offlinePeople, setOfflinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
   const { contextUsername, id } = useContext(UserContext);
@@ -41,9 +43,37 @@ const Home = () => {
       console.log('Disconnected. Trying to reconnect.');
       connectToWebSocket();
     }); //comment out incase you dont want to reconnect
-    console.log(onlinePeople);
+
     setWsc(wsc);
   }
+
+  useEffect(() => {
+    async function getPeople() {
+      let people = await axios.get('/people');
+      people = people.data.people;
+
+      const current = new Set();
+      for (const online of Object.keys(onlinePeople)) {
+        current.add(onlinePeople[online]);
+      }
+
+      people = people.filter((x) => {
+        return !current.has(x.username);
+      });
+      console.log({ people });
+      let obj = {};
+      for (let person of people) {
+        obj[person.userId] = person.username;
+      }
+      setOfflinePeople(obj);
+      console.log({ offlinePeople });
+    }
+
+    console.log({ len: Object.keys(onlinePeople).length });
+    if (Object.keys(onlinePeople).length > 0) {
+      getPeople();
+    }
+  }, [onlinePeople]);
 
   useEffect(() => {
     connectToWebSocket();
@@ -56,33 +86,20 @@ const Home = () => {
           <div className="min-w-fit h-full flex flex-col">
             <Logo username={contextUsername.split('@')[0]}></Logo>
             <div>
-              {Object.keys(onlinePeople).map((userId) =>
-                userId !== id ? (
-                  <div
-                    onClick={() => {
-                      setSelectedUserId(userId);
-                    }}
-                    className={
-                      'flex border border-l-0 border-r-0 border-t-0 border-b-[#3a506b] cursor-pointer ' +
-                      (userId === selectedUserId ? 'bg-[#0b132b]' : '')
-                    }
-                    key={userId}
-                  >
-                    {userId === selectedUserId && (
-                      <div className="border-2 h-16 rounded-r-xl"></div>
-                    )}
-                    <div className="flex gap-4 items-center pl-4 xl:l-10 p-4">
-                      <Avatar
-                        username={onlinePeople[userId]}
-                        userId={userId}
-                      ></Avatar>
-                      <span>{onlinePeople[userId].split('@')[0]}</span>
-                    </div>
-                  </div>
-                ) : (
-                  ''
-                )
-              )}
+              <ListPeople
+                people={onlinePeople}
+                id={id}
+                setSelectedUserId={setSelectedUserId}
+                selectedUserId={selectedUserId}
+                online={true}
+              ></ListPeople>
+              <ListPeople
+                people={offlinePeople}
+                id={id}
+                setSelectedUserId={setSelectedUserId}
+                selectedUserId={selectedUserId}
+                online={false}
+              ></ListPeople>
             </div>
           </div>
         </div>
