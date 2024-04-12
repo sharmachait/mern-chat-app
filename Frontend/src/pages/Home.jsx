@@ -12,14 +12,24 @@ const Home = () => {
   const [offlinePeople, setOfflinePeople] = useState({});
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const { contextUsername, id } = useContext(UserContext);
+  const { contextUsername, id, setId, setContextUsername } =
+    useContext(UserContext);
   const latestMessageRef = useRef();
 
   function handleMessage(e) {
     const messageData = JSON.parse(e.data);
 
     if ('online' in messageData) {
-      setOnlinePeople(messageData?.online);
+      let filteredOnline = {};
+      for (let i of Object.keys(messageData?.online)) {
+        if (messageData?.online[i] !== contextUsername) {
+          console.log({ fromMessage: messageData?.online[i] });
+          console.log({ loggedin: contextUsername });
+          filteredOnline[i] = messageData?.online[i];
+        }
+      }
+      console.log({ filteredOnline });
+      setOnlinePeople(filteredOnline);
     } else if ('text' in messageData) {
       if (id !== '') {
         setMessages((prev) => [
@@ -37,6 +47,10 @@ const Home = () => {
   }
 
   function connectToWebSocket() {
+    axios.get('/auth/profile').then((response) => {
+      setId(response.data.id);
+      setContextUsername(response.data.username);
+    });
     const wsc = new WebSocket('ws://localhost:3000');
     wsc.addEventListener('message', handleMessage);
     wsc.addEventListener('close', () => {
@@ -79,13 +93,22 @@ const Home = () => {
     connectToWebSocket();
   }, [id]);
 
+  async function logout(e) {
+    e.preventDefault();
+    await axios.post('/auth/logout');
+    setId(null);
+    setContextUsername(null);
+    wsc.close();
+    setWsc(null);
+  }
+
   return (
-    <div className="bg-[#3a506b] h-screen">
+    <div className="bg-[#0b132b] h-screen">
       <div className="flex h-full xl:mx-40 text-[#DAF2FE]">
         <div className="bg-[#1c2541] w-1/3">
           <div className="min-w-fit h-full flex flex-col">
             <Logo username={contextUsername.split('@')[0]}></Logo>
-            <div>
+            <div className="grow overflow-y-scroll">
               <ListPeople
                 people={onlinePeople}
                 id={id}
@@ -100,6 +123,14 @@ const Home = () => {
                 selectedUserId={selectedUserId}
                 online={false}
               ></ListPeople>
+            </div>
+            <div className="flex justify-center ">
+              <button
+                className=" mb-4 py-2 px-6 rounded rounded-xl bg-[#3a506b] text-xl text-purple-200"
+                onClick={logout}
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>

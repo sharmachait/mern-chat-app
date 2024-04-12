@@ -15,6 +15,7 @@ function sendAliveUsers(listOfClients) {
   }
   const users = {};
   listOfUsers.forEach((user) => (users[user.userId] = user.username));
+  console.log(users);
   listOfClients.forEach((client) => {
     client.send(JSON.stringify({ online: users }));
   });
@@ -63,12 +64,15 @@ async function setupSocketServer(expressServer) {
           });
 
           connection.on('close', () => {
-            delete connection['userId'];
-            delete connection['username'];
-            clearInterval(connection.pinger);
-            let listOfClients = [...wss.clients];
-            console.log('client deleted ');
-            sendAliveUsers(listOfClients);
+            setTimeout(() => {
+              console.log(connection.username);
+              delete connection['userId'];
+              delete connection['username'];
+              clearInterval(connection.pinger);
+              let listOfClients = [...wss.clients];
+              console.log('client deleted ');
+              sendAliveUsers(listOfClients);
+            }, 2000);
           });
           //all the connections are stored in the WebSocketServer.clients object
 
@@ -110,6 +114,7 @@ async function setupSocketServer(expressServer) {
       }
       //Notifying everyone about who is online
       let listOfClients = [...wss.clients];
+
       sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);

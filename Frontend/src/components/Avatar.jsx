@@ -1,7 +1,12 @@
 const Avatar = ({ username, userId, online }) => {
   return (
-    <div className="w-8 h-8 relative bg-purple-200 rounded-full flex items-center  text-[#0b132b]">
-      <div className="text-center w-full">
+    <div
+      className={
+        'w-8 h-8 relative  rounded-full flex items-center  text-[#0b132b] ' +
+        (online ? 'bg-purple-200' : 'bg-gray-500')
+      }
+    >
+      <div className="text-center w-full ">
         {String(username[0]).toUpperCase()}
       </div>
       {online ? (

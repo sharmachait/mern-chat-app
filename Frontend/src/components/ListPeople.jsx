@@ -9,7 +9,7 @@ const ListPeople = ({
   online,
 }) => {
   return (
-    <div className={online ? '' : 'opacity-55'}>
+    <div className={online ? '' : ''}>
       {Object.keys(people).map((userId) =>
         userId !== id ? (
           <div
@@ -25,7 +25,12 @@ const ListPeople = ({
             {userId === selectedUserId && (
               <div className="border-2 h-16 rounded-r-xl"></div>
             )}
-            <div className="flex gap-4 items-center pl-4 xl:l-10 p-4">
+            <div
+              className={
+                'flex gap-4 items-center pl-4 xl:l-10 p-4 ' +
+                (online ? 'text-purple-200' : 'text-gray-500')
+              }
+            >
               <Avatar
                 online={online}
                 username={people[userId]}

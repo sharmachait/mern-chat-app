@@ -55,9 +55,9 @@ const ChatWindow = ({
   return (
     <div
       ref={latestMessageRef}
-      className="ml-4 mr-4 p-4 xl:ml-10 flex flex-col h-full overflow-y-scroll"
+      className=" flex flex-col h-full overflow-y-scroll"
     >
-      <div className="flex-grow">
+      <div className="ml-4 mr-4 p-4 xl:ml-10 flex-grow ">
         {uniqueMessages.length > 0 && (
           <div className="flex flex-col">
             {uniqueMessages.map((x) => (
@@ -70,7 +70,7 @@ const ChatWindow = ({
           </div>
         )}
       </div>
-      <div>
+      <div className="p-4">
         <form className="flex gap-2 ">
           <input
             type="text"
@@ -79,11 +79,11 @@ const ChatWindow = ({
             onChange={(e) => {
               setNewText(e.target.value);
             }}
-            className="p-2 border border-[#DAF2FE] bg-[#1c2541] rounded-2xl text-[#DAF2FE] w-11/12"
+            className="p-2 border border-[#3a506b] bg-[#1c2541] rounded-2xl text-[#DAF2FE] w-11/12"
           />
           <button
             onClick={handleSend}
-            className="flex flex-row align-middle items-center justify-evenly p-2 border border-[#DAF2FE] rounded-full bg-[#3a506b] text-[#DAF2FE] w-1/12 min-w-fit"
+            className="flex flex-row align-middle items-center justify-evenly p-2  rounded-full bg-[#3a506b] text-[#DAF2FE] w-1/12 min-w-fit"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ const ChatWindow = ({
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-6 h-6"
+              className="w-6 h-6 text-purple-200"
             >
               <path
                 strokeLinecap="round"

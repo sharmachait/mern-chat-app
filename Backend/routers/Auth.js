@@ -120,4 +120,11 @@ router.get('/profile', async (req, res) => {
   }
 });
 
+router.post('/logout', async (req, res) => {
+  res
+    .cookie('token', '', { sameSite: 'none', secure: true })
+    .status(200)
+    .send('Logged out');
+});
+
 module.exports = router;
