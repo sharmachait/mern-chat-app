@@ -23,12 +23,9 @@ const Home = () => {
       let filteredOnline = {};
       for (let i of Object.keys(messageData?.online)) {
         if (messageData?.online[i] !== contextUsername) {
-          console.log({ fromMessage: messageData?.online[i] });
-          console.log({ loggedin: contextUsername });
           filteredOnline[i] = messageData?.online[i];
         }
       }
-      console.log({ filteredOnline });
       setOnlinePeople(filteredOnline);
     } else if ('text' in messageData) {
       if (id !== '') {
@@ -47,16 +44,16 @@ const Home = () => {
   }
 
   function connectToWebSocket() {
-    axios.get('/auth/profile').then((response) => {
-      setId(response.data.id);
-      setContextUsername(response.data.username);
-    });
+    // axios.get('/auth/profile').then((response) => {
+    //   setId(response.data.id);
+    //   setContextUsername(response.data.username);
+    // });
     const wsc = new WebSocket('ws://localhost:3000');
     wsc.addEventListener('message', handleMessage);
-    wsc.addEventListener('close', () => {
-      console.log('Disconnected. Trying to reconnect.');
-      connectToWebSocket();
-    }); //comment out incase you dont want to reconnect
+    // wsc.addEventListener('close', () => {
+    //   console.log('Disconnected. Trying to reconnect.');
+    //   // connectToWebSocket();
+    // }); //comment out incase you dont want to reconnect
 
     setWsc(wsc);
   }
@@ -74,19 +71,15 @@ const Home = () => {
       people = people.filter((x) => {
         return !current.has(x.username);
       });
-      console.log({ people });
+
       let obj = {};
       for (let person of people) {
         obj[person.userId] = person.username;
       }
       setOfflinePeople(obj);
-      console.log({ offlinePeople });
     }
 
-    console.log({ len: Object.keys(onlinePeople).length });
-    if (Object.keys(onlinePeople).length > 0) {
-      getPeople();
-    }
+    getPeople();
   }, [onlinePeople]);
 
   useEffect(() => {
@@ -99,7 +92,7 @@ const Home = () => {
     setId(null);
     setContextUsername(null);
     wsc.close();
-    setWsc(null);
+    // setWsc(null);
   }
 
   return (
@@ -108,7 +101,7 @@ const Home = () => {
         <div className="bg-[#1c2541] w-1/3">
           <div className="min-w-fit h-full flex flex-col">
             <Logo username={contextUsername.split('@')[0]}></Logo>
-            <div className="grow overflow-y-scroll">
+            <div className="flex flex-col grow overflow-y-scroll">
               <ListPeople
                 people={onlinePeople}
                 id={id}

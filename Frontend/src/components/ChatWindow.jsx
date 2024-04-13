@@ -26,7 +26,9 @@ const ChatWindow = ({
     );
     setNewText('');
   }
-
+  async function handleFileSend(e) {
+    console.log(e.target.files);
+  }
   useEffect(() => {
     async function getMessages() {
       const response = await axios.get(`messages/${selectedUserId}`);
@@ -81,9 +83,26 @@ const ChatWindow = ({
             }}
             className="p-2 border border-[#3a506b] bg-[#1c2541] rounded-2xl text-[#DAF2FE] w-11/12"
           />
+          <label className="text-purple-200 flex flex-row align-middle items-center  cursor-pointer justify-evenly p-2 rounded-full bg-[#3a506b]  w-1/12 min-w-fit">
+            <input type="file" className="hidden" onChange={handleFileSend} />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13"
+              />
+            </svg>
+          </label>
           <button
             onClick={handleSend}
-            className="flex flex-row align-middle items-center justify-evenly p-2  rounded-full bg-[#3a506b] text-[#DAF2FE] w-1/12 min-w-fit"
+            className="flex flex-row align-middle items-center justify-evenly p-2 rounded-full bg-[#3a506b]  w-1/12 min-w-fit"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

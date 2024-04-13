@@ -52,6 +52,7 @@ async function setupSocketServer(expressServer) {
             connection.killer = setTimeout(() => {
               connection.isAlive = false;
               connection.terminate();
+              clearInterval(connection.pinger);
               let listOfClients = [...wss.clients];
               console.log('client killed. ');
               sendAliveUsers(listOfClients);
@@ -65,7 +66,7 @@ async function setupSocketServer(expressServer) {
 
           connection.on('close', () => {
             setTimeout(() => {
-              console.log(connection.username);
+              // console.log(connection.username);
               delete connection['userId'];
               delete connection['username'];
               clearInterval(connection.pinger);
