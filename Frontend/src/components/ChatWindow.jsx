@@ -27,11 +27,28 @@ const ChatWindow = ({
     setNewText('');
   }
   async function handleFileSend(e) {
-    console.log(e.target.files);
+    const file = e.target.files[0];
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const imageBase64 = reader.result.split(',')[1];
+      wsc.send(
+        JSON.stringify({
+          sender: id,
+          recipient: selectedUserId,
+          file: imageBase64,
+          name: file.name,
+          type: file.type,
+          mimeType: file.type,
+        })
+      );
+    };
   }
   useEffect(() => {
     async function getMessages() {
-      const response = await axios.get(`messages/${selectedUserId}`);
+      const response = await axios.get(`messages/get/${selectedUserId}`);
       if (response.status === 200) {
         const messagesFromDb = response.data.messages;
         setMessages(messagesFromDb);
