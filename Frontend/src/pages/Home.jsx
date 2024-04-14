@@ -40,6 +40,19 @@ const Home = () => {
           },
         ]);
       }
+    } else if ('file' in messageData) {
+      if (id !== '') {
+        setMessages((prev) => [
+          ...prev,
+          {
+            file: messageData.file,
+            messageId: messageData.messageId,
+            sender: messageData.sender,
+            recipient: messageData.recipient,
+            from: messageData.from,
+          },
+        ]);
+      }
     }
   }
 

@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 const MessageModel = require('./models/Message');
 const { mapMessage } = require('./Utils/AutoMapperConfig');
 const bcrypt = require('bcryptjs');
+
 const jwtSecret = process.env.JwtSecret;
 const bcryptsalt = bcrypt.genSaltSync(10);
 async function StartUp() {
@@ -29,6 +30,7 @@ async function StartUp() {
 
     app.use(bodyParser.json());
     app.use(cookieParser());
+    app.use('/uploads', express.static(__dirname + '\\uploads'));
     app.use('/auth', authRouter);
     app.use('/messages', messageRouter);
 

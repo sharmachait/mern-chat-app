@@ -3,6 +3,8 @@ import { UserContext } from '../store/UserContext.jsx';
 import { uniqBy } from 'lodash';
 import Message from './Message.jsx';
 import axios from 'axios';
+import message from './Message.jsx';
+import Image from './Image.jsx';
 
 const ChatWindow = ({
   wsc,
@@ -70,7 +72,7 @@ const ChatWindow = ({
   }, [messages]);
 
   const uniqueMessages = uniqBy(messages, 'messageId');
-
+  console.log({ uniqueMessages });
   return (
     <div
       ref={latestMessageRef}
@@ -79,13 +81,21 @@ const ChatWindow = ({
       <div className="ml-4 mr-4 p-4 xl:ml-10 flex-grow ">
         {uniqueMessages.length > 0 && (
           <div className="flex flex-col">
-            {uniqueMessages.map((x) => (
-              <Message
-                key={x.messageId}
-                message={x}
-                onlinePeople={onlinePeople}
-              ></Message>
-            ))}
+            {uniqueMessages.map((x) => {
+              if (x.text && x.sender == selectedUserId && x.recipient == id) {
+                return (
+                  <div key={x.messageId}>
+                    <Message message={x}></Message>
+                  </div>
+                );
+              } else if (
+                x.file &&
+                x.sender == selectedUserId &&
+                x.recipient == id
+              ) {
+                return <Image key={x.messageId} message={x}></Image>;
+              }
+            })}
           </div>
         )}
       </div>

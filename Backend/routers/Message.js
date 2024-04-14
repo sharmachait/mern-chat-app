@@ -13,7 +13,7 @@ const bcryptsalt = bcrypt.genSaltSync(10);
 
 const router = express.Router();
 
-router.get('/:selectedUserId', async (req, res) => {
+router.get('/get/:selectedUserId', async (req, res) => {
   try {
     const selectedUserId = req.params.selectedUserId;
     let token = req.cookies?.token;
@@ -37,7 +37,8 @@ router.get('/:selectedUserId', async (req, res) => {
       for (let i = 0; i < messages.length; i++) {
         messages[i] = mapMessage(messages[i]);
       }
-      console.log(messages);
+
+      console.log({ messages });
       res.status(200).json({ messages });
     } else {
       res.status(403).json({ msg: 'unauthorized' });

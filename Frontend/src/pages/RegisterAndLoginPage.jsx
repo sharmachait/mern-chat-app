@@ -7,7 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 const RegisterAndLoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [formMode, setFormMode] = useState('Register');
+  const [formMode, setFormMode] = useState('Login');
 
   const { setContextUsername, setId } = useContext(UserContext);
 
@@ -48,6 +48,7 @@ const RegisterAndLoginPage = () => {
   return (
     <div className="bg-[#0b132b] h-svh flex flex-col gap-2 items-center justify-center ">
       <div className="text-purple-200 font-bold text-2xl p-2">yapp</div>
+      <div className="text-purple-200 font-bold text-lg p-2">{formMode}</div>
       <form className="w-80 flex flex-col gap-2 mb-40">
         <input
           value={username}
