@@ -2,6 +2,7 @@ const ws = require('ws');
 const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JwtSecret;
 const MessageModel = require('./models/Message');
+const fs = require('fs');
 
 function getIdUsernameFromClient(client) {
   return { userId: client.userId, username: client.username };
@@ -79,7 +80,8 @@ async function setupSocketServer(expressServer) {
 
           connection.on('message', async (message) => {
             message = JSON.parse(message.toString());
-            const { recipient, text } = message;
+            const { recipient, text, file, name, type } = message;
+            console.log(file);
             if (recipient && text) {
               const messageDoc = await MessageModel.create({
                 sender: connection.userId,
@@ -95,6 +97,37 @@ async function setupSocketServer(expressServer) {
                   client.send(
                     JSON.stringify({
                       text,
+                      sender: connection.userId,
+                      recipient: recipient,
+                      messageId: messageDoc._id,
+                      from: messageDoc.from,
+                    })
+                  );
+                }
+              }
+            } else if (recipient && file) {
+              let parts = name.split('.');
+              let extension = parts[parts.length - 1];
+              const filename = Date.now() + '.' + extension;
+              const path = __dirname + '\\uploads\\' + filename;
+              const buffer = Buffer.from(file, 'base64');
+              fs.writeFile(path, buffer, 'base64', () => {
+                console.log('file saved at: ' + path);
+              });
+              const messageDoc = await MessageModel.create({
+                sender: connection.userId,
+                from: connection.username,
+                recipient: recipient,
+                file: path,
+              });
+              for (let client of wss.clients) {
+                if (
+                  client.userId === recipient ||
+                  client.userId === connection.userId
+                ) {
+                  client.send(
+                    JSON.stringify({
+                      file: filename,
                       sender: connection.userId,
                       recipient: recipient,
                       messageId: messageDoc._id,

@@ -3,6 +3,8 @@ import { UserContext } from '../store/UserContext.jsx';
 import { uniqBy } from 'lodash';
 import Message from './Message.jsx';
 import axios from 'axios';
+import message from './Message.jsx';
+import Image from './Image.jsx';
 
 const ChatWindow = ({
   wsc,
@@ -27,11 +29,28 @@ const ChatWindow = ({
     setNewText('');
   }
   async function handleFileSend(e) {
-    console.log(e.target.files);
+    const file = e.target.files[0];
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      const imageBase64 = reader.result.split(',')[1];
+      wsc.send(
+        JSON.stringify({
+          sender: id,
+          recipient: selectedUserId,
+          file: imageBase64,
+          name: file.name,
+          type: file.type,
+          mimeType: file.type,
+        })
+      );
+    };
   }
   useEffect(() => {
     async function getMessages() {
-      const response = await axios.get(`messages/${selectedUserId}`);
+      const response = await axios.get(`messages/get/${selectedUserId}`);
       if (response.status === 200) {
         const messagesFromDb = response.data.messages;
         setMessages(messagesFromDb);
@@ -53,7 +72,7 @@ const ChatWindow = ({
   }, [messages]);
 
   const uniqueMessages = uniqBy(messages, 'messageId');
-
+  console.log({ uniqueMessages });
   return (
     <div
       ref={latestMessageRef}
@@ -62,13 +81,21 @@ const ChatWindow = ({
       <div className="ml-4 mr-4 p-4 xl:ml-10 flex-grow ">
         {uniqueMessages.length > 0 && (
           <div className="flex flex-col">
-            {uniqueMessages.map((x) => (
-              <Message
-                key={x.messageId}
-                message={x}
-                onlinePeople={onlinePeople}
-              ></Message>
-            ))}
+            {uniqueMessages.map((x) => {
+              if (x.text && x.sender == selectedUserId && x.recipient == id) {
+                return (
+                  <div key={x.messageId}>
+                    <Message message={x}></Message>
+                  </div>
+                );
+              } else if (
+                x.file &&
+                x.sender == selectedUserId &&
+                x.recipient == id
+              ) {
+                return <Image key={x.messageId} message={x}></Image>;
+              }
+            })}
           </div>
         )}
       </div>

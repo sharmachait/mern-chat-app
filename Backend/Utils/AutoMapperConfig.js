@@ -1,9 +1,21 @@
 function mapMessage(from) {
-  console.log(from);
+  if (from.file) {
+    let parts = from?.file.split('\\');
+    let name = parts?.[parts.length - 1];
+    let to = {
+      sender: from['sender'],
+      recipient: from['recipient'],
+      text: from?.text,
+      from: from['from'],
+      messageId: from['_id'],
+      file: name,
+    };
+    return to;
+  }
   let to = {
     sender: from['sender'],
     recipient: from['recipient'],
-    text: from['text'],
+    text: from?.text,
     from: from['from'],
     messageId: from['_id'],
   };
