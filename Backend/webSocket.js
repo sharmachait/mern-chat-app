@@ -17,7 +17,7 @@ function sendAliveUsers(listOfClients) {
   }
   const users = {};
   listOfUsers.forEach((user) => (users[user.userId] = user.username));
-  console.log(users);
+
   listOfClients.forEach((client) => {
     client.send(JSON.stringify({ online: users }));
   });
@@ -67,17 +67,18 @@ async function setupSocketServer(expressServer) {
           });
 
           connection.on('close', () => {
-            setTimeout(() => {
-              // console.log(connection.username);
-              delete connection['userId'];
-              delete connection['username'];
-              clearInterval(connection.pinger);
-              let listOfClients = [...wss.clients];
-              console.log('client deleted ');
-              sendAliveUsers(listOfClients);
-            }, 2000);
+            // delete connection['userId'];
+            // delete connection['username'];
+            clearInterval(connection.pinger);
+            connection.isAlive = false;
+
+            let listOfClients = [...wss.clients];
+            listOfClients = listOfClients.filter(
+              (x) => x.username != connection.username
+            );
+            sendAliveUsers(listOfClients);
+            connection.terminate();
           });
-          //all the connections are stored in the WebSocketServer.clients object
 
           connection.on('message', async (message) => {
             message = JSON.parse(message.toString());
@@ -112,7 +113,7 @@ async function setupSocketServer(expressServer) {
               const path = __dirname + '\\uploads\\' + filename;
               const buffer = Buffer.from(file, 'base64');
               const { imageUrl } = await saveToBlob(name, extension, buffer);
-              console.log(imageUrl);
+
               fs.writeFile(path, buffer, 'base64', () => {
                 console.log('file saved at: ' + path);
               });
@@ -152,7 +153,6 @@ async function setupSocketServer(expressServer) {
       }
       //Notifying everyone about who is online
       let listOfClients = [...wss.clients];
-
       sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);

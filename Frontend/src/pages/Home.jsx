@@ -105,6 +105,7 @@ const Home = () => {
     await axios.post('/auth/logout');
     setId(null);
     setContextUsername(null);
+
     wsc.close();
     // setWsc(null);
   }
