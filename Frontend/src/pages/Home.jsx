@@ -50,6 +50,7 @@ const Home = () => {
             sender: messageData.sender,
             recipient: messageData.recipient,
             from: messageData.from,
+            urlOnAzure: messageData.urlOnAzure,
           },
         ]);
       }

@@ -9,6 +9,7 @@ function mapMessage(from) {
       from: from['from'],
       messageId: from['_id'],
       file: name,
+      urlOnAzure: from.urlOnAzure,
     };
     return to;
   }

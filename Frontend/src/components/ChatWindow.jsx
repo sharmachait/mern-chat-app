@@ -54,9 +54,6 @@ const ChatWindow = ({
       if (response.status === 200) {
         const messagesFromDb = response.data.messages;
         setMessages(messagesFromDb);
-        console.log(messagesFromDb);
-
-        console.log({ messagesFromDb: messagesFromDb });
       }
       return response;
     }
@@ -68,11 +65,12 @@ const ChatWindow = ({
   useEffect(() => {
     const div = latestMessageRef.current;
     div.scrollTop = div.scrollHeight;
-    console.log({ messagesOnFrontend: messages[0] });
   }, [messages]);
 
   const uniqueMessages = uniqBy(messages, 'messageId');
   console.log({ uniqueMessages });
+  console.log({ selectedUserId });
+  console.log({ id });
   return (
     <div
       ref={latestMessageRef}
@@ -82,7 +80,11 @@ const ChatWindow = ({
         {uniqueMessages.length > 0 && (
           <div className="flex flex-col">
             {uniqueMessages.map((x) => {
-              if (x.text && x.sender == selectedUserId && x.recipient == id) {
+              if (
+                x.text &&
+                ((x.sender == selectedUserId && x.recipient == id) ||
+                  (x.sender == id && x.recipient == selectedUserId))
+              ) {
                 return (
                   <div key={x.messageId}>
                     <Message message={x}></Message>
@@ -90,8 +92,8 @@ const ChatWindow = ({
                 );
               } else if (
                 x.file &&
-                x.sender == selectedUserId &&
-                x.recipient == id
+                ((x.sender == selectedUserId && x.recipient == id) ||
+                  (x.sender == id && x.recipient == selectedUserId))
               ) {
                 return <Image key={x.messageId} message={x}></Image>;
               }
