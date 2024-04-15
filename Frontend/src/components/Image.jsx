@@ -13,7 +13,8 @@ const Image = ({ message }) => {
         >
           <img
             className="rounded-2xl max-h-96"
-            src={'http://localhost:3000/uploads/' + message.file}
+            // src={'http://localhost:3000/uploads/' + message.file}
+            src={message.urlOnAzure}
             alt=""
           />
         </div>
@@ -41,7 +42,8 @@ const Image = ({ message }) => {
           >
             <img
               className="rounded-2xl max-h-96"
-              src={'http://localhost:3000/uploads/' + message.file}
+              // src={'http://localhost:3000/uploads/' + message.file}
+              src={message.urlOnAzure}
               alt=""
             />
           </div>

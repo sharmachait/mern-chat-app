@@ -17,6 +17,7 @@ const MessageSchema = new mongoose.Schema(
       required: false,
     },
     from: String,
+    urlOnAzure: String,
     file: {
       type: String,
       required: false,

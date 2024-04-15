@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const jwtSecret = process.env.JwtSecret;
 const MessageModel = require('./models/Message');
 const fs = require('fs');
+const saveToBlob = require('./Services/AzureBlobService');
 
 function getIdUsernameFromClient(client) {
   return { userId: client.userId, username: client.username };
@@ -16,7 +17,7 @@ function sendAliveUsers(listOfClients) {
   }
   const users = {};
   listOfUsers.forEach((user) => (users[user.userId] = user.username));
-  console.log(users);
+
   listOfClients.forEach((client) => {
     client.send(JSON.stringify({ online: users }));
   });
@@ -66,22 +67,22 @@ async function setupSocketServer(expressServer) {
           });
 
           connection.on('close', () => {
-            setTimeout(() => {
-              // console.log(connection.username);
-              delete connection['userId'];
-              delete connection['username'];
-              clearInterval(connection.pinger);
-              let listOfClients = [...wss.clients];
-              console.log('client deleted ');
-              sendAliveUsers(listOfClients);
-            }, 2000);
+            // delete connection['userId'];
+            // delete connection['username'];
+            clearInterval(connection.pinger);
+            connection.isAlive = false;
+
+            let listOfClients = [...wss.clients];
+            listOfClients = listOfClients.filter(
+              (x) => x.username != connection.username
+            );
+            sendAliveUsers(listOfClients);
+            connection.terminate();
           });
-          //all the connections are stored in the WebSocketServer.clients object
 
           connection.on('message', async (message) => {
             message = JSON.parse(message.toString());
             const { recipient, text, file, name, type } = message;
-            console.log(file);
             if (recipient && text) {
               const messageDoc = await MessageModel.create({
                 sender: connection.userId,
@@ -111,6 +112,8 @@ async function setupSocketServer(expressServer) {
               const filename = Date.now() + '.' + extension;
               const path = __dirname + '\\uploads\\' + filename;
               const buffer = Buffer.from(file, 'base64');
+              const { imageUrl } = await saveToBlob(name, extension, buffer);
+
               fs.writeFile(path, buffer, 'base64', () => {
                 console.log('file saved at: ' + path);
               });
@@ -119,6 +122,7 @@ async function setupSocketServer(expressServer) {
                 from: connection.username,
                 recipient: recipient,
                 file: path,
+                urlOnAzure: imageUrl,
               });
               for (let client of wss.clients) {
                 if (
@@ -128,6 +132,7 @@ async function setupSocketServer(expressServer) {
                   client.send(
                     JSON.stringify({
                       file: filename,
+                      urlOnAzure: messageDoc.urlOnAzure,
                       sender: connection.userId,
                       recipient: recipient,
                       messageId: messageDoc._id,
@@ -148,7 +153,6 @@ async function setupSocketServer(expressServer) {
       }
       //Notifying everyone about who is online
       let listOfClients = [...wss.clients];
-
       sendAliveUsers(listOfClients);
     } catch (e) {
       console.log('error: ' + e);

@@ -50,6 +50,7 @@ const Home = () => {
             sender: messageData.sender,
             recipient: messageData.recipient,
             from: messageData.from,
+            urlOnAzure: messageData.urlOnAzure,
           },
         ]);
       }
@@ -104,6 +105,7 @@ const Home = () => {
     await axios.post('/auth/logout');
     setId(null);
     setContextUsername(null);
+
     wsc.close();
     // setWsc(null);
   }
