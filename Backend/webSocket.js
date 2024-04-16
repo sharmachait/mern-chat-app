@@ -67,8 +67,6 @@ async function setupSocketServer(expressServer) {
           });
 
           connection.on('close', () => {
-            // delete connection['userId'];
-            // delete connection['username'];
             clearInterval(connection.pinger);
             connection.isAlive = false;
 
@@ -78,6 +76,8 @@ async function setupSocketServer(expressServer) {
             );
             sendAliveUsers(listOfClients);
             connection.terminate();
+            delete connection['userId'];
+            delete connection['username'];
           });
 
           connection.on('message', async (message) => {
