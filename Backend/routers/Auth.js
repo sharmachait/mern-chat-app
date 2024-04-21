@@ -18,9 +18,7 @@ router.post('/verify', async (req, res) => {
       username,
     });
     const compare = req.body.token === UserDoc.emailConfirmationToken;
-    console.log(req.body.token);
-    console.log(UserDoc.emailConfirmationToken);
-    console.log(compare);
+
     if (compare) {
       await UserModel.updateOne(
         { username: req.body.username },
@@ -81,7 +79,7 @@ router.post('/login', async (req, res) => {
 
     if (!UserDoc.emailConfirmedFlag) {
       res.status(401).json({ msg: 'Account not verified' });
-    } else if (!hashed === UserDoc.password) {
+    } else if (!bcrypt.compareSync(password, UserDoc.password)) {
       res.status(401).json({ msg: 'Incorrect credentials' });
     } else {
       let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
