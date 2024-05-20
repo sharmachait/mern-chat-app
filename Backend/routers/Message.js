@@ -25,7 +25,7 @@ router.get('/get/:selectedUserId', async (req, res) => {
       const UserDoc = await UserModel.findById(id);
 
       if (!UserDoc.emailConfirmedFlag) {
-        res.status(401).json({ msg: 'Account not verified' });
+        return res.status(401).json({ msg: 'Account not verified' });
       }
       const currUserId = UserDoc._id;
 
@@ -39,9 +39,9 @@ router.get('/get/:selectedUserId', async (req, res) => {
       }
 
       console.log({ messages });
-      res.status(200).json({ messages });
+      return res.status(200).json({ messages });
     } else {
-      res.status(403).json({ msg: 'unauthorized' });
+      return res.status(403).json({ msg: 'unauthorized' });
     }
   } catch (e) {
     console.log(e);

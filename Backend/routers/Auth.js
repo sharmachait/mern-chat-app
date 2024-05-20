@@ -24,9 +24,9 @@ router.post('/verify', async (req, res) => {
         { username: req.body.username },
         { emailConfirmedFlag: true }
       );
-      res.status(201).json({ msg: 'Verified' });
+      return res.status(201).json({ msg: 'Verified' });
     } else {
-      res.status(500).json({ msg: 'Invalid token' });
+      return res.status(500).json({ msg: 'Invalid token' });
     }
   } catch (e) {
     res.status(500).json({ msg: 'user not found' });
@@ -62,7 +62,7 @@ router.post('/register', async (req, res) => {
     const response = await sendMail(defaultFrom, defaultTo, subject, token);
     if (response !== 'Email Sent Successfully')
       throw new Error('email not sent');
-    res.status(201).json({ response: response });
+    return res.status(201).json({ response: response });
   } catch (e) {
     res.status(400).json(e);
   }
@@ -78,9 +78,9 @@ router.post('/login', async (req, res) => {
     });
 
     if (!UserDoc.emailConfirmedFlag) {
-      res.status(401).json({ msg: 'Account not verified' });
+      return res.status(401).json({ msg: 'Account not verified' });
     } else if (!bcrypt.compareSync(password, UserDoc.password)) {
-      res.status(401).json({ msg: 'Incorrect credentials' });
+      return res.status(401).json({ msg: 'Incorrect credentials' });
     } else {
       let token = await jwt.sign({ id: UserDoc._id, username }, jwtSecret);
       // await setupSocketServer(server);
@@ -105,12 +105,12 @@ router.get('/profile', async (req, res) => {
       const UserDoc = await UserModel.findById(id);
 
       if (!UserDoc.emailConfirmedFlag) {
-        res.status(401).json({ msg: 'Account not verified' });
+        return res.status(401).json({ msg: 'Account not verified' });
       }
 
-      res.status(200).json({ id: UserDoc._id, username: UserDoc.username });
+      return res.status(200).json({ id: UserDoc._id, username: UserDoc.username });
     } else {
-      res.status(401).json({ msg: 'unauthorized' });
+      return res.status(401).json({ msg: 'unauthorized' });
     }
   } catch (e) {
     console.log(e);
