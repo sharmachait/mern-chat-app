@@ -121,11 +121,11 @@ router.post('/logout', async (req, res) => {
     .send('Logged out');
 });
 
-// router.get('/logout', async (req, res) => {
-//   res
-//     .cookie('token', '', { sameSite: 'none', secure: true })
-//     .status(201)
-//     .send('logged out');
-// });
+router.get('/logout', async (req, res) => {
+  res
+    .cookie('token', '', { sameSite: 'none', secure: true })
+    .status(201)
+    .send('logged out');
+});
 
 module.exports = router;
