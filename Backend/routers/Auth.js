@@ -32,12 +32,6 @@ router.post('/verify', async (req, res) => {
     res.status(500).json({ msg: 'user not found' });
   }
 });
-router.get('/logout', async (req, res) => {
-  res
-    .cookie('token', '', { sameSite: 'none', secure: true })
-    .status(201)
-    .send('logged out');
-});
 
 router.post('/register', async (req, res) => {
   try {
@@ -108,7 +102,9 @@ router.get('/profile', async (req, res) => {
         return res.status(401).json({ msg: 'Account not verified' });
       }
 
-      return res.status(200).json({ id: UserDoc._id, username: UserDoc.username });
+      return res
+        .status(200)
+        .json({ id: UserDoc._id, username: UserDoc.username });
     } else {
       return res.status(401).json({ msg: 'unauthorized' });
     }
@@ -124,5 +120,12 @@ router.post('/logout', async (req, res) => {
     .status(200)
     .send('Logged out');
 });
+
+// router.get('/logout', async (req, res) => {
+//   res
+//     .cookie('token', '', { sameSite: 'none', secure: true })
+//     .status(201)
+//     .send('logged out');
+// });
 
 module.exports = router;
